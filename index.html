@@ -23,6 +23,7 @@
     border-radius: 12px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     max-width: 360px;
+    transition: 0.3s ease;
   }
   input {
     width: 100%;
@@ -64,7 +65,7 @@
     border: 1px solid #ddd;
     display: none;
   }
-  #downloadLink {
+  #downloadLink, #resetBtn {
     display: none;
   }
 </style>
@@ -75,13 +76,13 @@
   <form id="form">
     <label for="phone">Masukkan Nomor HP (tanpa spasi):</label><br><br>
     <input type="text" id="phone" placeholder="08xx-xxxx-xxxx" required><br>
-    <button type="submit">Buat Brosur</button><br>
-    <!-- tombol download di dalam form -->
-    <a id="downloadLink" class="button-link" href="#" download="brosur-accessnet.jpg">💾 Save Image As (JPG)</a>
+    <button type="submit">Buat Brosur</button>
   </form>
 
   <div id="preview">
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas"></canvas><br>
+    <a id="downloadLink" class="button-link" href="#" download="brosur-accessnet.jpg">💾 Save Image As (JPG)</a><br>
+    <button id="resetBtn">🔁 Buat Ulang</button>
   </div>
 
 <script>
@@ -89,6 +90,7 @@ const form = document.getElementById('form');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const downloadLink = document.getElementById('downloadLink');
+const resetBtn = document.getElementById('resetBtn');
 const bgImage = new Image();
 bgImage.src = 'brosur_master.png';
 
@@ -101,12 +103,12 @@ form.addEventListener('submit', async (e) => {
 
   if (!bgImage.complete) await bgImage.decode();
 
-  // gambar brosur
+  // Gambar brosur
   canvas.width = bgImage.width;
   canvas.height = bgImage.height;
   ctx.drawImage(bgImage, 0, 0);
 
-  // teks nomor hp
+  // Teks nomor HP
   const fontSize = Math.floor(canvas.width * 0.055);
   ctx.font = `bold ${fontSize}px Arial`;
   ctx.fillStyle = '#003399';
@@ -114,12 +116,26 @@ form.addEventListener('submit', async (e) => {
   ctx.textBaseline = 'middle';
   ctx.fillText(phone, canvas.width * 0.625, canvas.height * 0.877);
 
-  // tampilkan hasil dan tombol
+  // Tampilkan hasil dan tombol
   canvas.style.display = 'block';
   const dataURL = canvas.toDataURL('image/jpeg', 0.95);
   downloadLink.href = dataURL;
   downloadLink.download = `brosur-accessnet-${phone}.jpg`;
   downloadLink.style.display = 'inline-block';
+  resetBtn.style.display = 'inline-block';
+
+  // Sembunyikan form setelah generate
+  form.style.display = 'none';
+});
+
+// Tombol buat ulang
+resetBtn.addEventListener('click', () => {
+  // Kosongkan input dan tampilkan kembali form
+  document.getElementById('phone').value = '';
+  form.style.display = 'block';
+  canvas.style.display = 'none';
+  downloadLink.style.display = 'none';
+  resetBtn.style.display = 'none';
 });
 </script>
 </body>
